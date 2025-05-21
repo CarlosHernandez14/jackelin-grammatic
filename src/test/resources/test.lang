@@ -1,21 +1,17 @@
-int a = 10;
-float b = 20.5;
-boolean flag = true;
-string saludo = "Hola mundo";
+entero n <- 5 fin
+entero fact <- 1 fin
 
-a = 3 + 5;
-b = b / 2;
-
-print(a);
-print(b);
-print(saludo);
-
-if (a > 10) {
-    print("a es mayor que 10");
-} else {
-    print("a no es mayor que 10");
+para (entero i <- 1 fin i <= n fin i <- i + 1) {
+    fact <- fact * i fin
+    imprimir("hola") fin
 }
 
-for (int i = 0; i < 3; i = i + 1) {
-    print(i);
+si (fact > 100) {
+    imprimir("El factorial es mayor que 100") fin
+} sino {
+    imprimir("El factorial es 100 o menor") fin
 }
+
+imprimir(fact) fin
+
+finprog

@@ -1,46 +1,40 @@
 grammar Language;
 
-
 program
-    : secuencia EOF
+    : secuencia FIN_PROG
     ;
 
 secuencia
-    : (instruccion)+
+    : instruccion+
     ;
 
 instruccion
-    : declaracion PYC
-    | asignacion PYC
-    | expArit PYC
-    | expLogica PYC
-    | ifBlock
-    | forBlock
-    | printInstruccion // Agregar printInstruccion aquí
+    : declaracion FIN_STMT
+    | asignacion FIN_STMT
+    | expresion FIN_STMT
+    | siBloque
+    | paraBloque
+    | imprimir FIN_STMT
     ;
 
-// Definimos la regla para el ciclo for
-forBlock
-    : FOR PAREIZ declaracion PYC expLogica PYC asignacion PAREDR KEYIZ secuencia KEYDR
-    ;
-
-printInstruccion
-    : PRINT PAREIZ expresion PAREDR PYC
-    ;
+// Declaración y asignación
 
 declaracion
-    : TIPO ID (OP_ASIG expresion)? // Declaración con o sin asignación
+    : TIPO ID OP_ASIG expresion
     ;
 
 asignacion
     : ID OP_ASIG expresion
     ;
 
+// Expresiones con prioridades
+
 expresion
-    : expArit
-    | expLogica
-    | STRING
-    | ID
+    : CADENA                              # exprCadena
+    | BOOL                                # exprBool
+    | ID                                  # exprId
+    | expLogica                           # exprLogica
+    | expArit                             # exprArit
     ;
 
 expLogica
@@ -57,48 +51,57 @@ termino
 
 factor
     : NUM
-    | STRING
-    | BOOL
     | ID
     | PAREIZ expresion PAREDR
     ;
 
-ifBlock
-    : IF PAREIZ expLogica PAREDR KEYIZ secuencia KEYDR (elseIfBlock)* (elseBlock)?
+// Bloques
+
+siBloque
+    : SI PAREIZ expLogica PAREDR LLAVEIZQ secuencia LLAVEDER
+      ( SINO LLAVEIZQ secuencia LLAVEDER )?
     ;
 
-elseIfBlock
-    : ELSE IF PAREIZ expLogica PAREDR KEYIZ secuencia KEYDR
+paraBloque
+    : PARA PAREIZ declaracion FIN_STMT expLogica FIN_STMT asignacion PAREDR
+      LLAVEIZQ secuencia LLAVEDER
     ;
 
-elseBlock
-    : ELSE KEYIZ secuencia KEYDR
+imprimir
+    : IMPRIMIR PAREIZ expresion PAREDR
     ;
 
-// Lexer rules
-TIPO : 'int' | 'float' | 'boolean' | 'string' ;
-OP_ASIG : '=' ;
-OP_SUMA : '+' ;
-OP_REST : '-' ;
-OP_MULT : '*' ;
-OP_DIV : '/' ;
-OP_REL : '>' | '<' | '>=' | '<=' | '==' ;
-PAREIZ : '(' ;
-PAREDR : ')' ;
-KEYIZ : '{' ;
-KEYDR : '}' ;
-IF : 'if' ;
-ELSE : 'else' ;
-FOR : 'for' ; // Agregamos la palabra clave 'for'
-PRINT : 'print' ; // Agregamos la palabra clave 'print'
-PYC : ';' ;
-NUM : [0-9]+('.'[0-9]+)? ;
-STRING : '"' (~["])* '"' ;
-BOOL : 'true' | 'false' ;
-ID : [a-zA-Z_][a-zA-Z_0-9]* ;
+// Terminadores
 
-// Regla para comentarios de una línea
+FIN_STMT  : 'fin' ;
+FIN_PROG  : 'finprog' ;
+
+// Operadores y palabras reservadas
+
+TIPO      : 'entero' | 'flotante' | 'booleano' | 'cadena' ;
+OP_ASIG   : '<-' ;
+OP_SUMA   : '+' ;
+OP_REST   : '-' ;
+OP_MULT   : '*' ;
+OP_DIV    : '/' ;
+OP_REL    : '>' | '<' | '>=' | '<=' | '==' ;
+PAREIZ    : '(' ;
+PAREDR    : ')' ;
+LLAVEIZQ  : '{' ;
+LLAVEDER  : '}' ;
+SI        : 'si' ;
+SINO      : 'sino' ;
+PARA      : 'para' ;
+IMPRIMIR  : 'imprimir' ;
+
+// Literales y identificadores
+
+NUM       : [0-9]+ ('.' [0-9]+)? ;
+CADENA    : '"' (~["\r\n])* '"' ;
+BOOL      : 'verdadero' | 'falso' ;
+ID        : [a-zA-Z_][a-zA-Z_0-9]* ;
+
+// Comentarios y espacios
+
 LINE_COMMENT : '//' ~[\r\n]* -> skip ;
-
-// Regla para ignorar espacios en blanco
 WS : [ \t\r\n]+ -> skip ;

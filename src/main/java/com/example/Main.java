@@ -23,7 +23,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         String files[] = args.length == 0 ? new String[]{"test." + EXTENSION} : args;
-        System.out.println("Dirbase: " + DIRBASE);
+        // System.out.println("Dirbase: " + DIRBASE);
         
         try {
             UIManager.setLookAndFeel(new DarculaThemeDarklafLookAndFeel());
@@ -38,7 +38,7 @@ public class Main {
         });
         
         for (String file : files) {
-            System.out.println("START: " + file);
+            // System.out.println("START: " + file);
 
             LanguageCustomVisitor visitor = new LanguageCustomVisitor();
             try {
@@ -51,9 +51,8 @@ public class Main {
                 parser.removeErrorListeners();
                 parser.addErrorListener(new BaseErrorListener() {
                     @Override
-                    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                        System.err.println("Error de sintaxis en la línea " + line + ":" + charPositionInLine + " - " + msg);
-                        throw new RuntimeException("Error de sintaxis detectado. Deteniendo ejecución.");
+                    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPos, String msg, RecognitionException e) {
+                        System.err.printf("Error sintaxis %d:%d %s\n", line, charPos, msg);
                     }
                 });
 
@@ -66,12 +65,13 @@ public class Main {
                 System.err.println("Error: " + e.getMessage());
                 System.exit(1); // Detener la ejecución
             } finally {
-                System.out.println("\n=== TABLA DE SÍMBOLOS FINAL ===");
-                visitor.getTablaSimbolos().forEach((k, v) -> 
-                    System.out.printf("%-10s = %-8s (%s)%n", k, v, (v != null) ? v.getClass().getSimpleName() : "null"));
+                // System.out.println("=== TABLA DE SÍMBOLOS FINAL ===");
+                // visitor.tablaSimbolos.forEach((k,v) ->
+                //     System.out.printf("%s = %s (%s)\n", k, v.valor, v.tipo)
+                // );
             }
 
-            System.out.println("FINISH: " + file);
+            // System.out.println("FINISH: " + file);
         }
     }
 }
