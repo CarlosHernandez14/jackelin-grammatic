@@ -6,6 +6,8 @@ package com.example.views;
 
 import com.example.utils.Language;
 import com.github.weisj.darklaf.extensions.rsyntaxarea.DarklafRSyntaxTheme;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -22,6 +24,8 @@ import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import jnafilechooser.api.JnaFileChooser;
+
+import org.fife.ui.rsyntaxtextarea.ErrorStrip;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
@@ -47,9 +51,8 @@ public class HomeWindow extends javax.swing.JFrame {
         
         // Default language
         this.radioJava.setSelected(true);
-        this.radioPython.setSelected(false);
+        this.radioCpp.setSelected(false);
         this.selectedLanguage = Language.JAVA;
-        
         this.fileTree.setModel(null);
         
         initCodeEditor();
@@ -61,6 +64,7 @@ public class HomeWindow extends javax.swing.JFrame {
     } 
     
     private void initCodeEditor() {
+        this.containerCodeEditor.removeAll();
         
         RSyntaxTextArea textArea = new RSyntaxTextArea();
         textArea.setFont(new Font(Font.SERIF, Font.PLAIN, 15));
@@ -68,12 +72,24 @@ public class HomeWindow extends javax.swing.JFrame {
         
         Theme theme = new DarklafRSyntaxTheme();
         theme.apply(textArea);
+
+        CustomParser parser = new CustomParser();
+        parser.setSelectedLanguage(this.selectedLanguage);
+        parser.setTextAreaConverted(this.textAreaConverted);
+        parser.setTextAreaOutput(this.textAreaOutput);
+        textArea.addParser(parser);
+        textArea.setCodeFoldingEnabled(true);
+        textArea.setAntiAliasingEnabled(true);
+
+        ErrorStrip errorStrip = new ErrorStrip(textArea);
+        this.containerCodeEditor.setLayout(new BorderLayout());
         
         this.textArea = textArea;
         RTextScrollPane sp = new RTextScrollPane(textArea);
         sp.setBorder(null);
         // Add the code editor to the container panel
-        this.containerCodeEditor.add(sp);
+        this.containerCodeEditor.add(sp, BorderLayout.CENTER);
+        this.containerCodeEditor.add(errorStrip, BorderLayout.LINE_END);
         
     }
     
@@ -141,7 +157,7 @@ public class HomeWindow extends javax.swing.JFrame {
 
         popupOptions = new javax.swing.JPopupMenu();
         menuLanguage = new javax.swing.JMenu();
-        radioPython = new javax.swing.JRadioButtonMenuItem();
+        radioCpp = new javax.swing.JRadioButtonMenuItem();
         radioJava = new javax.swing.JRadioButtonMenuItem();
         containerWindow = new javax.swing.JPanel();
         containerNavbar = new javax.swing.JPanel();
@@ -160,7 +176,11 @@ public class HomeWindow extends javax.swing.JFrame {
         containerTerminal = new javax.swing.JPanel();
         tabbedPaneTerminal = new javax.swing.JTabbedPane();
         panelOutput = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        textAreaOutput = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        textAreaConverted = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         itemOpenFile = new javax.swing.JMenuItem();
@@ -169,13 +189,13 @@ public class HomeWindow extends javax.swing.JFrame {
 
         menuLanguage.setText("Convertion Language");
 
-        radioPython.setText("Python");
-        radioPython.addActionListener(new java.awt.event.ActionListener() {
+        radioCpp.setText("Cpp");
+        radioCpp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                radioPythonActionPerformed(evt);
+                radioCppActionPerformed(evt);
             }
         });
-        menuLanguage.add(radioPython);
+        menuLanguage.add(radioCpp);
 
         radioJava.setSelected(true);
         radioJava.setText("Java");
@@ -196,7 +216,7 @@ public class HomeWindow extends javax.swing.JFrame {
         containerNavbar.setBackground(new java.awt.Color(79, 78, 78));
         containerNavbar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         containerNavbar.setPreferredSize(new java.awt.Dimension(814, 50));
-        containerNavbar.setLayout(new java.awt.CardLayout(0, 3));
+        containerNavbar.setLayout(new java.awt.CardLayout());
 
         containerElements.setBackground(new java.awt.Color(79, 78, 78));
 
@@ -231,7 +251,7 @@ public class HomeWindow extends javax.swing.JFrame {
         );
         containerTabbarLayout.setVerticalGroup(
             containerTabbarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
+            .addGap(0, 57, Short.MAX_VALUE)
         );
 
         jScrollPane2.setViewportView(containerTabbar);
@@ -327,32 +347,28 @@ public class HomeWindow extends javax.swing.JFrame {
         tabbedPaneTerminal.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
         panelOutput.setBackground(new java.awt.Color(79, 78, 78));
+        panelOutput.setLayout(new java.awt.CardLayout());
 
-        javax.swing.GroupLayout panelOutputLayout = new javax.swing.GroupLayout(panelOutput);
-        panelOutput.setLayout(panelOutputLayout);
-        panelOutputLayout.setHorizontalGroup(
-            panelOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 808, Short.MAX_VALUE)
-        );
-        panelOutputLayout.setVerticalGroup(
-            panelOutputLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 80, Short.MAX_VALUE)
-        );
+        textAreaOutput.setBackground(new java.awt.Color(64, 63, 63));
+        textAreaOutput.setColumns(20);
+        textAreaOutput.setLineWrap(true);
+        textAreaOutput.setRows(5);
+        jScrollPane3.setViewportView(textAreaOutput);
+
+        panelOutput.add(jScrollPane3, "card2");
 
         tabbedPaneTerminal.addTab("OUTPUT", panelOutput);
 
         jPanel1.setBackground(new java.awt.Color(79, 78, 78));
+        jPanel1.setLayout(new java.awt.CardLayout());
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 808, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 80, Short.MAX_VALUE)
-        );
+        textAreaConverted.setBackground(new java.awt.Color(66, 65, 65));
+        textAreaConverted.setColumns(20);
+        textAreaConverted.setLineWrap(true);
+        textAreaConverted.setRows(5);
+        jScrollPane4.setViewportView(textAreaConverted);
+
+        jPanel1.add(jScrollPane4, "card2");
 
         tabbedPaneTerminal.addTab("CONVERTED", jPanel1);
 
@@ -402,7 +418,7 @@ public class HomeWindow extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(containerWindow, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(containerWindow, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
         );
 
         pack();
@@ -472,16 +488,20 @@ public class HomeWindow extends javax.swing.JFrame {
         
     }//GEN-LAST:event_btnOptionsActionPerformed
 
-    private void radioPythonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioPythonActionPerformed
+    private void radioCppActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioCppActionPerformed
         // TODO add your handling code here:
         this.radioJava.setSelected(false);
-        this.selectedLanguage = Language.PYTHON;
-    }//GEN-LAST:event_radioPythonActionPerformed
+        this.selectedLanguage = Language.CPP;
+        
+        this.initCodeEditor();
+    }//GEN-LAST:event_radioCppActionPerformed
 
     private void radioJavaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioJavaActionPerformed
         // TODO add your handling code here:
-        this.radioPython.setSelected(false);
+        this.radioCpp.setSelected(false);
         this.selectedLanguage = Language.JAVA;
+        
+        this.initCodeEditor();
     }//GEN-LAST:event_radioJavaActionPerformed
 
     private void itemOpenFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemOpenFolderActionPerformed
@@ -604,12 +624,16 @@ public class HomeWindow extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JMenu menuLanguage;
     private javax.swing.JPanel panelOutput;
     private javax.swing.JPopupMenu popupOptions;
+    private javax.swing.JRadioButtonMenuItem radioCpp;
     private javax.swing.JRadioButtonMenuItem radioJava;
-    private javax.swing.JRadioButtonMenuItem radioPython;
     private javax.swing.JTabbedPane tabbedPaneTerminal;
+    private javax.swing.JTextArea textAreaConverted;
+    private javax.swing.JTextArea textAreaOutput;
     // End of variables declaration//GEN-END:variables
 }

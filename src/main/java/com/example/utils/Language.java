@@ -7,6 +7,6 @@ package com.example.utils;
 public enum Language {
     
     JAVA,
-    PYTHON
+    CPP
     
 }
