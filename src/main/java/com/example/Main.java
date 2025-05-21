@@ -41,6 +41,7 @@ public class Main {
             // System.out.println("START: " + file);
 
             LanguageCustomVisitor visitor = new LanguageCustomVisitor();
+            EvalVisitor evalVisitor = new EvalVisitor();
             try {
                 CharStream in = CharStreams.fromFileName(DIRBASE + file);
                 LanguageLexer lexer = new LanguageLexer(in);
@@ -58,6 +59,19 @@ public class Main {
 
                 LanguageParser.ProgramContext tree = parser.program();
                 visitor.visit(tree);
+
+                System.out.println("=== CÓDIGO JAVA ===");
+                visitor.getJavaLines().forEach(System.out::println);
+                System.out.println("=== CÓDIGO C++ ===");
+                visitor.getCppLines().forEach(System.out::println);
+
+                // Ejecutar el visitor de evaluación
+                System.out.println("=== RESULTADOS ===");
+                evalVisitor.visit(tree);
+                
+                System.out.println(evalVisitor.getOutput());
+
+
             } catch (ArithmeticException e) {
                 System.err.println("Error durante la ejecución: " + e.getMessage());
                 System.exit(1); // Detener la ejecución
@@ -69,6 +83,7 @@ public class Main {
                 // visitor.tablaSimbolos.forEach((k,v) ->
                 //     System.out.printf("%s = %s (%s)\n", k, v.valor, v.tipo)
                 // );
+                
             }
 
             // System.out.println("FINISH: " + file);
