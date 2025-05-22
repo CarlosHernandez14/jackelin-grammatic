@@ -186,6 +186,7 @@ public class HomeWindow extends javax.swing.JFrame {
         itemOpenFile = new javax.swing.JMenuItem();
         itemOpenFolder = new javax.swing.JMenuItem();
         itemSave = new javax.swing.JMenuItem();
+        itemExportCode = new javax.swing.JMenuItem();
 
         menuLanguage.setText("Convertion Language");
 
@@ -406,6 +407,14 @@ public class HomeWindow extends javax.swing.JFrame {
         });
         fileMenu.add(itemSave);
 
+        itemExportCode.setText("Export");
+        itemExportCode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemExportCodeActionPerformed(evt);
+            }
+        });
+        fileMenu.add(itemExportCode);
+
         jMenuBar1.add(fileMenu);
 
         setJMenuBar(jMenuBar1);
@@ -538,6 +547,40 @@ public class HomeWindow extends javax.swing.JFrame {
         
     }//GEN-LAST:event_fileTreeValueChanged
 
+    private void itemExportCodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemExportCodeActionPerformed
+        // TODO add your handling code here:
+        JnaFileChooser fc = new JnaFileChooser();
+            // Mostrar únicamente ficheros (y la caja de texto para teclear un nuevo nombre)
+        fc.setMode(JnaFileChooser.Mode.Files);
+        fc.addFilter("All files", "*");
+        fc.addFilter("Cpp Files", "cpp");
+        fc.addFilter("Java Files", "java");
+        fc.setTitle("Guardar como…");
+        File picked;
+        if (fc.showSaveDialog(this)) {
+            picked = fc.getSelectedFile();
+        } else {
+            // El usuario canceló el diálogo
+            return;
+        }
+        
+
+        try {
+            // Obtiene el texto del editor
+            String codigo = this.textAreaConverted.getText();
+            // Escribe (sobrescribe) el fichero en UTF-8
+            Files.write(picked.toPath(), codigo.getBytes(StandardCharsets.UTF_8));
+            JOptionPane.showMessageDialog(this, "Archivo exportado correctamente.", 
+                                          "Info", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al guardar el archivo:\n" + ex.getMessage(), 
+                "Error", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(HomeWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }//GEN-LAST:event_itemExportCodeActionPerformed
+
     private DefaultMutableTreeNode createNodes(File dir) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(dir.getName());
         File[] files = dir.listFiles();
@@ -616,6 +659,7 @@ public class HomeWindow extends javax.swing.JFrame {
     private javax.swing.JPanel containerWindow;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JTree fileTree;
+    private javax.swing.JMenuItem itemExportCode;
     private javax.swing.JMenuItem itemOpenFile;
     private javax.swing.JMenuItem itemOpenFolder;
     private javax.swing.JMenuItem itemSave;
